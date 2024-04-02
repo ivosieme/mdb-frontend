@@ -1,0 +1,40 @@
+name: React App CI/CD
+
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build . -t ghcr.io/${{ github.repository_owner }}/react-app:latest
+
+      - name: Log in to GitHub Container Registry
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GIT_ACCESS_TOKEN }}
+
+      - name: Push Docker image to GitHub Container Registry
+        if: github.ref == 'refs/heads/main'
+        run: docker push ghcr.io/${{ github.repository_owner }}/frontend:latest
+
+      - name: Set up Kubeconfig
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig
+          echo "KUBECONFIG_FILE=${PWD}/kubeconfig" >> $GITHUB_ENV
+
+      - name: Deploy to Kubernetes
+        if: github.ref == 'refs/heads/main'
+        run: |
+          kubectl --kubeconfig $KUBECONFIG_FILE apply -f frontend-deployment.yaml -n mdb || true
+          kubectl --kubeconfig $KUBECONFIG_FILE apply -f frontend-loadbalancer.yaml -n mdb || true
+          kubectl --kubeconfig $KUBECONFIG_FILE apply -f frontend-hpa.yaml -n mdb || true
+        env:
+          KUBECONFIG_FILE: ${{ env.KUBECONFIG_FILE }}
