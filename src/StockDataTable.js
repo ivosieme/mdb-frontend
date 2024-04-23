@@ -35,18 +35,19 @@ const StockDataTable = () => {
             <tr>
                 <th>Symbol</th>
                 <th>Name</th>
+                <th>Trend</th>
                 <th>Last Sale</th>
                 <th>High Sale</th>
                 <th>Low Sale</th>
                 <th>Volatility Index</th>
-                <th>Trend</th>
+
             </tr>
             </thead>
             <tbody>
             {stocks.map((stock, index) => {
                 const previous = prevStocks[stock.symbol];
                 const lastSaleChange = previous ? stock.lastSale - previous.lastSale : 0;
-                const trendSymbol = lastSaleChange === 0 ? '' : lastSaleChange > 0 ? '↑' : '↓';
+                const trendSymbol = lastSaleChange === 0 ? '' : lastSaleChange > 0 ? 'u' : 'd';
                 const trendColor = lastSaleChange > 0 ? 'green' : 'red';
 
                 return (
