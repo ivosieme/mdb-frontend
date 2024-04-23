@@ -32,6 +32,7 @@ const StockDataTable = () => {
                 <th>Last Sale</th>
                 <th>High Sale</th>
                 <th>Low Sale</th>
+                <th>Volatility Index</th>
             </tr>
             </thead>
             <tbody>
@@ -42,6 +43,7 @@ const StockDataTable = () => {
                     <td>{stock.lastSale}</td>
                     <td>{stock.highSale}</td>
                     <td>{stock.lowSale}</td>
+                    <td>{stock.volatilityIndex}</td>
                 </tr>
             ))}
             </tbody>
